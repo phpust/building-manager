@@ -1,0 +1,118 @@
+.fi-form-actions{
+	direction: rtl;
+}
+
+.is-selected{
+	background-color: hsla(0,0%,100%,.05);
+}
+
+.word-list-array, .word-list-array .grid {
+  display: inline-block;
+}
+
+td.fi-table-cell-lesson\.title > div > div > a {
+	width: 10%;
+}
+
+.underline-span span{
+	text-decoration: underline;
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 100;
+    src: url('../fonts/estedad-fd/estedad-fd-thin.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-thin.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 200;
+    src: url('../fonts/estedad-fd/estedad-fd-extralight.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-extralight.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 300;
+    src: url('../fonts/estedad-fd/estedad-fd-light.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/estedad-fd/estedad-fd-regular.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 500;
+    src: url('../fonts/estedad-fd/estedad-fd-medium.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 600;
+    src: url('../fonts/estedad-fd/estedad-fd-semibold.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-semibold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/estedad-fd/estedad-fd-bold.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 800;
+    src: url('../fonts/estedad-fd/estedad-fd-extrabold.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-extrabold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Font1;
+    font-display: swap;
+    font-style: normal;
+    font-weight: 900;
+    src: url('../fonts/estedad-fd/estedad-fd-black.woff2') format('woff2'), url('../fonts/estedad-fd/estedad-fd-black.ttf') format('truetype');
+}
+
+
+/* Custom font for Farsi (fa) locale */
+[dir="rtl"] {
+    font-family: 'Font1', sans-serif; /* Replace with your custom font */
+}
+
+[dir="ltr"] {
+    font-family: 'Inter', sans-serif; /* Replace with your custom font */
+}
+
+[dir="rtl"] .filepond--drop-label.filepond--drop-label label {
+    font-family: 'Font1';
+}
+
+.margintop32 {
+    margin-top: 32px;
+}
+
+.truncate{
+    overflow: visible;
+    white-space: normal;
+}
+
+.grid-cols-4 {
+    grid-template-columns: repeat(4,minmax(0,1fr))
+}
