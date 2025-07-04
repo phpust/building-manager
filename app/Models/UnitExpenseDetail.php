@@ -92,4 +92,37 @@ class UnitExpenseDetail extends Model
             $this->updateQuietly(['is_paid' => $isNowPaid]); 
         }
     }
+
+    public function getPayerUserAttribute(): ?\App\Models\User
+    {
+        $date = $this->expense?->date_from ?? $this->created_at;
+
+        if ($this->payer_type === 'tenant') {
+            $tenant = $this->unit->tenants()
+                ->where('from_date', '<=', $date)
+                ->where(function ($q) use ($date) {
+                    $q->whereNull('to_date')
+                      ->orWhere('to_date', '>=', $date);
+                })
+                ->first()?->user;
+
+            if ($tenant) {
+                return $tenant;
+            }
+        }
+
+        return $this->unit->owners()
+            ->where('from_date', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereNull('to_date')
+                  ->orWhere('to_date', '>=', $date);
+            })
+            ->first()?->user;
+    }
+
+    public function getPayerNameAttribute(): string
+    {
+        return $this->payer_user->name;
+    }
+
 }

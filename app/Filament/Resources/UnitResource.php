@@ -5,20 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UnitResource\Pages;
 use App\Filament\Resources\UnitResource\RelationManagers;
 use App\Models\Unit;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UnitResource extends Resource
 {
     protected static ?string $model = Unit::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-
 
     public static function getModelLabel(): string
     {
@@ -27,7 +26,7 @@ class UnitResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'واحد ها';
+        return 'واحدها';
     }
 
     public static function form(Form $form): Form
@@ -38,14 +37,16 @@ class UnitResource extends Resource
                     ->label('شماره واحد')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('owner_name')
-                    ->label('نام مالک')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tenant_name')
-                    ->label('نام مستاجر')
-                    ->nullable()
-                    ->maxLength(255),
+
+                Forms\Components\TextInput::make('floor')
+                    ->label('طبقه')
+                    ->numeric()
+                    ->nullable(),
+
+                Forms\Components\Textarea::make('description')
+                    ->label('توضیحات')
+                    ->rows(3)
+                    ->nullable(),
             ]);
     }
 
@@ -55,14 +56,19 @@ class UnitResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('شناسه')->sortable(),
                 Tables\Columns\TextColumn::make('number')->label('شماره واحد')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('owner_name')->label('نام مالک')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('tenant_name')->label('نام مستاجر')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('floor')->label('طبقه')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('ownersNameInFinancialYear')->label('مالک ')->searchable(),
+                Tables\Columns\TextColumn::make('tenantsNameInFinancialYear')->label('مستأجر ')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->label('تاریخ ایجاد')->jalaliDate(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
+                Tables\Actions\Action::make('financial')
+                    ->label('وضعیت مالی')
+                    ->icon('heroicon-o-eye')
+                    ->color('primary')
+                    ->url(fn (Unit $record) => Pages\UnitFinancialReport::getUrl([$record]))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -76,16 +82,18 @@ class UnitResource extends Resource
         return [
             RelationManagers\UnitExpenseDetailsRelationManager::class,
             RelationManagers\DepositsRelationManager::class,
+            RelationManagers\OwnersRelationManager::class,
+            RelationManagers\TenantsRelationManager::class,
         ];
     }
-
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUnits::route('/'),
-            'create' => Pages\CreateUnit::route('/create'),
-            'edit' => Pages\EditUnit::route('/{record}/edit'),
+            'index'      => Pages\ListUnits::route('/'),
+            'create'     => Pages\CreateUnit::route('/create'),
+            'edit'       => Pages\EditUnit::route('/{record}/edit'),
+            'financial'  => Pages\UnitFinancialReport::route('/{record}/financial'),
         ];
     }
 }

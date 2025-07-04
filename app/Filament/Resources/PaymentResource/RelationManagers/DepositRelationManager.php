@@ -67,7 +67,7 @@ class DepositRelationManager extends RelationManager
                     ->form(function (Deposit $record) {
                         return [
                             Forms\Components\Placeholder::make('remaining_payment')
-                                ->label('مبلغ باقی‌مانده از پرداختی')
+                                ->label('مبلغ باقی مانده از پرداختی')
                                 ->content(function (callable $get, callable $set, $livewire) {
                                     $record = $livewire->ownerRecord;
                                     return number_format($record->remaining_amount) . ' ریال';
@@ -80,7 +80,7 @@ class DepositRelationManager extends RelationManager
                                     return $remaining . ' ریال';
                                 }),
                             Forms\Components\TextInput::make('amount_used')
-                                ->label('مبلغ پرداخت‌شده')
+                                ->label('مبلغ پرداخت شده')
                                 ->mask(RawJs::make('$money($input)'))
                                 ->stripCharacters([','])
                                 ->required(),

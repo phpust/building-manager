@@ -11,7 +11,7 @@ class Deposit extends Model
 {
     use HasFinancialYear;
     
-    protected $fillable = ['unit_id', 'payer_type', 'amount', 'financial_year', 'is_paid'];
+    protected $fillable = ['title', 'unit_id', 'payer_type', 'amount', 'financial_year', 'is_paid'];
 
     protected $casts = [
         'amount' => 'decimal:0',

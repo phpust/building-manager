@@ -13,6 +13,12 @@ class EditExpense extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('create_expense')
+                ->label('ثبت هزینه جدید')
+                ->icon('heroicon-o-plus')
+                ->url(fn () => ExpenseResource::getUrl('create'))
+                ->color('success'),
+
             Actions\DeleteAction::make(),
         ];
     }

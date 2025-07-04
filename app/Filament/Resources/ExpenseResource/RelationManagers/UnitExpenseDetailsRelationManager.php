@@ -36,15 +36,28 @@ class UnitExpenseDetailsRelationManager extends RelationManager
             ->where('unit_id', $this->ownerRecord->unit_id);
     }
 
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('payer_type')
+                    ->label('بر عهده')
+                    ->options([
+                        'owner' => 'مالک',
+                        'tenant' => 'مستاجر',
+                    ])
+                    ->required(),
+            ]);
+    }
+
     public function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('شناسه')->sortable(),
                 Tables\Columns\TextColumn::make('expense.financial_year')->label('سال مالی')->sortable(),
-                Tables\Columns\TextColumn::make('unit.owner_name')->label('مالک'),
                 Tables\Columns\TextColumn::make('expense.title')->label('عنوان'),
-                Tables\Columns\TextColumn::make('payer_type')->label('بر عهده'),
+                Tables\Columns\TextColumn::make('payer_name')->label('بر عهده'),
                 Tables\Columns\TextColumn::make('amount_due')->label('مبلغ بدهی')->formatStateUsing(fn($state) => number_format($state) . ' ریال'),
 
                 Tables\Columns\IconColumn::make('is_paid')->label('وضعیت پرداخت')->boolean(),
@@ -76,7 +89,6 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                         return $years;
                     }),
             ])
-
             ->headerActions([])
             ->actions([
                 Tables\Actions\EditAction::make(),

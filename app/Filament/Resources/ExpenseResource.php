@@ -16,6 +16,7 @@ use Mokhosh\FilamentJalali\Forms\Components\JalaliDatePicker;
 use Illuminate\Support\Facades\Storage;
 use Filament\Support\RawJs;
 use Morilog\Jalali\Jalalian;
+use App\Models\Setting;
 
 class ExpenseResource extends Resource
 {
@@ -38,23 +39,15 @@ class ExpenseResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('financial_year')
-                    ->label('سال مالی')
-                    ->options(function () {
-                        $currentYear = Jalalian::now()->getYear();
-                        $years = [];
-                        for ($i = $currentYear - 10; $i <= $currentYear + 1; $i++) {
-                            $years[$i] = $i;
-                        }
-                        return $years;
-                    })
-                    ->default(Jalalian::now()->getYear())
-                    ->required(),
+                
+                Forms\Components\Hidden::make('financial_year')->default(fn () => Setting::financialYear()),
                 Forms\Components\TextInput::make('title')
                     ->label('عنوان هزینه')
                     ->required()
                     ->maxLength(255),
-
+                Forms\Components\Toggle::make('is_charge')
+                    ->label('این مورد شارژ ماهانه است؟')
+                    ->inline(false),
                 Forms\Components\TextInput::make('total_amount')
                     ->label('مبلغ کل')
                     ->mask(RawJs::make('$money($input)'))
@@ -69,27 +62,32 @@ class ExpenseResource extends Resource
                     ])
                     ->required(),
 
-                Forms\Components\DatePicker::make('date_from')
-                    ->label('تاریخ ')
-                    ->nullable()->jalali(),
+               Forms\Components\DatePicker::make('date_from')
+                    ->label('تاریخ')
+                    ->jalali()
+                    ->nullable(),
 
 
                 Forms\Components\Select::make('unit_ids')
                     ->label('واحدهای درگیر')
                     ->options(function () {
-                        $units = \App\Models\Unit::pluck('owner_name', 'id')->toArray();
+                        $units = \App\Models\Unit::all()->mapWithKeys(fn($unit) => [
+                            (string)$unit->id => 'واحد ' . $unit->number
+                        ])->toArray();
                         return ['all' => 'همه واحدها'] + $units;
                     })
                     ->multiple()
                     ->preload()
+                    ->searchable()
                     ->reactive()
                     ->afterStateUpdated(function (callable $set, $state) {
-                        if (in_array('all', $state)) {
+                        if (in_array('all', (array)$state)) {
                             $allIds = \App\Models\Unit::pluck('id')->toArray();
                             $set('unit_ids', $allIds);
                         }
                     })
                     ->required(),
+
 
                 Forms\Components\FileUpload::make('attachment')
                     ->label('فایل فاکتور')

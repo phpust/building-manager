@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource\RelationManagers;
 use App\Models\Payment;
+use App\Models\Setting;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -35,23 +36,19 @@ class PaymentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('financial_year')
-                    ->label('سال مالی')
-                    ->options(function () {
-                        $currentYear = Jalalian::now()->getYear();
-                        $years = [];
-                        for ($i = $currentYear - 10; $i <= $currentYear + 1; $i++) {
-                            $years[$i] = $i;
-                        }
-                        return $years;
-                    })
-                    ->default(Jalalian::now()->getYear())
-                    ->required(),
+                Forms\Components\Hidden::make('financial_year')->default(fn () => Setting::financialYear()),
                 Forms\Components\Select::make('unit_id')
                     ->label('واحد')
+                    ->options(function () {
+                        return \App\Models\Unit::all()->mapWithKeys(fn($unit) => [
+                            (string)$unit->id => 'واحد ' . $unit->number
+                        ])->toArray();
+                    })
                     ->searchable()
                     ->preload()
-                    ->relationship('unit', 'owner_name')
+                    ->afterStateUpdated(function (callable $set) {
+                        $set('user_id', null);
+                    })
                     ->required(),
                 Forms\Components\Select::make('payer_type')
                     ->label('پرداخت کننده')
@@ -59,6 +56,33 @@ class PaymentResource extends Resource
                         'owner' => 'مالک',
                         'tenant' => 'مستاجر',
                     ])
+                    ->required(),
+                Forms\Components\Select::make('user_id')
+                    ->label('پرداخت کننده')
+                    ->options(function (callable $get) {
+                        $unitId = $get('unit_id');
+                        $fy     = $get('financial_year') ?? Setting::financialYear();
+                        $userId = $get('user_id');
+
+                        $options = [];
+
+                        if ($unitId) {
+                            $options = \App\Models\Unit::find($unitId)
+                                ?->eligibleUsersForFinancialYear($fy)
+                                ?->toArray() ?? [];
+                        }
+
+                        if ($userId && ! isset($options[$userId])) {
+                            $options[$userId] = \App\Models\User::find($userId)?->name ?? $userId;
+                        }
+
+                        if (! $unitId) return [];
+
+                        return \App\Models\Unit::find($unitId)?->eligibleUsersForFinancialYear($fy)?->toArray() ?? [];
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->reactive()
                     ->required(),
                 Forms\Components\TextInput::make('amount')
                     ->label('مبلغ')
@@ -86,8 +110,8 @@ class PaymentResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('ID')->sortable()->label('شناسه'),
                 Tables\Columns\TextColumn::make('financial_year')->label('سال مالی')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('unit.owner_name')->label('مالک واحد')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('payer_type')->label('پرداخت کننده')->sortable(),
+                Tables\Columns\TextColumn::make('unit.number')->label('شماره واحد')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('user.name')->label('پرداخت کننده')->sortable(),
                 Tables\Columns\TextColumn::make('amount')->label('مبلغ')->sortable()->money('IRR', true, 'fa'),
                 Tables\Columns\TextColumn::make('paid_at')->label('تاریخ پرداخت')->jalaliDate()->sortable(),
                 Tables\Columns\TextColumn::make('description')->label('توضیحات')->limit(50),

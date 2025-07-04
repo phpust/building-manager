@@ -13,6 +13,7 @@ use App\Models\UnitExpenseDetail;
 use Filament\Tables\Actions\Action;
 use Filament\Support\RawJs;
 use Morilog\Jalali\Jalalian;
+use Illuminate\Database\Eloquent\Collection;
 
 class UnitExpenseDetailsRelationManager extends RelationManager
 {
@@ -53,7 +54,7 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('id')->label('شناسه')->sortable(),
                 Tables\Columns\TextColumn::make('expense.financial_year')->label('سال مالی')->sortable(),
                 Tables\Columns\TextColumn::make('unit.owner_name')->label('مالک'),
-                Tables\Columns\TextColumn::make('expense.title')->label('عنوان'),
+                Tables\Columns\TextColumn::make('expense.title')->label('عنوان')->searchable(),
                 Tables\Columns\TextColumn::make('payer_type')->label('بر عهده'),
                 Tables\Columns\TextColumn::make('amount_due')->label('مبلغ بدهی')->formatStateUsing(fn($state) => number_format($state) . ' ریال'),
 
@@ -109,7 +110,7 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                                     return number_format($record->remaining_amount) . ' ریال';
                                 }),
                             Forms\Components\Placeholder::make('remaining_amounts')
-                                ->label('مبالغ باقی‌مانده از بدهی')
+                                ->label('مبالغ باقی مانده از بدهی')
                                 ->content(function (UnitExpenseDetail $expense, callable $get, callable $set, $livewire) {
                                     $payment = $livewire->ownerRecord;
                                     
@@ -119,8 +120,13 @@ class UnitExpenseDetailsRelationManager extends RelationManager
 
                                     return $expenseRemaining;
                                 }),
+                            Forms\Components\Toggle::make('mark_as_paid')
+                                ->label('پرداخت شده')
+                                ->inline(false)
+                                ->dehydrated(true)
+                                ->default(false),
                             Forms\Components\TextInput::make('amount_used')
-                                ->label('مبلغ پرداخت‌شده')
+                                ->label('مبلغ پرداخت شده')
                                 ->mask(RawJs::make('$money($input)'))
                                 ->stripCharacters([','])
                                 ->required(),
@@ -134,9 +140,24 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                             ->where('payable_id', $record->id)
                             ->first();
 
+                        if(!$paymentUsage){
+                            \App\Models\PaymentUsage::create([
+                                'payment_id'    => $payment->id,
+                                'payable_type'  => \App\Models\UnitExpenseDetail::class,
+                                'payable_id'    => $record->id,
+                                'amount_used'   => 0,
+                            ]);
+
+                            $paymentUsage = \App\Models\PaymentUsage::where('payment_id', $payment->id)
+                                ->where('payable_type', \App\Models\UnitExpenseDetail::class)
+                                ->where('payable_id', $record->id)
+                                ->first();
+                        }
+
                         if ($paymentUsage) {
                             $form->fill([
                                 'amount_used' => $paymentUsage->amount_used,
+                                'mark_as_paid' => $record->is_paid ?? 0
                             ]);
                         }
                     })
@@ -161,7 +182,6 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                         }
                         
                         $previousAmountUsed = $paymentUsage->amount_used;
-
 
                         // check to not exceed maximum payment remaining
                         $totalOtherUsages = $payment->usages()->where('id', '!=', $paymentUsage->id)->sum('amount_used');
@@ -195,9 +215,13 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                             'amount_used' => $newAmount,
                         ]);
 
-                        // به‌روزرسانی وضعیت پرداخت
-                        $totalPaid = $record->paymentUsages()->sum('amount_used');
-                        $record->is_paid = $totalPaid >= $record->amount_due;
+                        if( $data['mark_as_paid'] ){
+                            $record->is_paid = $data['mark_as_paid'];
+                        } else {
+                            $totalPaid = $record->paymentUsages()->sum('amount_used');
+                            $record->is_paid = $totalPaid >= $record->amount_due;
+                        }
+
                         $record->save();
 
                         \Filament\Notifications\Notification::make()
@@ -206,6 +230,70 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                             ->send();
                     }),
             ])
-            ->bulkActions([]);
+            ->bulkActions($this->bulkActions());
+    }
+
+    protected function bulkActions(): array
+    {
+        return [
+            Tables\Actions\BulkAction::make('bulkPay')
+                ->label('پرداخت دسته جمعی')
+                ->color('success')
+                ->requiresConfirmation()
+                ->deselectRecordsAfterCompletion()      // بعد از اجرا، ردیف ها از حالت انتخاب خارج شوند
+                ->form([
+                    Forms\Components\TextInput::make('amount_used')
+                        ->label('مبلغ برای هر ردیف (ریال)')
+                        ->numeric()
+                        ->default(0)
+                        ->mask(RawJs::make('$money($input)'))
+                        ->stripCharacters([','])
+                        ->required(),
+
+                    Forms\Components\Toggle::make('mark_as_paid')
+                        ->label('ثبت به عنوان تسویه شده')
+                        ->inline(false)
+                        ->default(true),
+                ])
+                ->action(function (Collection $records, array $data, $livewire) {
+                    /** @var \App\Models\Payment $payment */
+                    $payment = $livewire->getOwnerRecord();   // رکورد والد (Payment) در Relation Manager
+
+                    foreach ($records as $record) {
+                        // ➊ پیدا یا ایجاد Usage مربوط به این پرداخت و هزینه
+                        $usage = $record->paymentUsages()
+                            ->firstOrCreate(
+                                [
+                                    'payment_id'   => $payment->id,
+                                ],
+                                [
+                                    'payable_type' => \App\Models\UnitExpenseDetail::class,
+                                    'payable_id'   => $record->id,
+                                    'amount_used'  => 0,
+                                ]
+                            );
+
+                        // ➋ به روزرسانی مبلغ مصرف شده
+                        $usage->update([
+                            'amount_used' => $data['amount_used'],
+                        ]);
+
+                        // ➌ وضعیت تسویه
+                        if ($data['mark_as_paid']) {
+                            $record->is_paid = true;
+                        } else {
+                            $totalPaid       = $record->paymentUsages()->sum('amount_used');
+                            $record->is_paid = $totalPaid >= $record->amount_due;
+                        }
+
+                        $record->save();
+                    }
+
+                    \Filament\Notifications\Notification::make()
+                        ->title('پرداخت دسته جمعی با موفقیت ذخیره شد')
+                        ->success()
+                        ->send();
+                }),
+        ];
     }
 }

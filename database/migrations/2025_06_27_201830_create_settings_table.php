@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
+            $table->string('key');
+            $table->string('value', 191)->nullable();
+            $table->boolean('is_active')
+                  ->default(false)
+                  ->index();
+
             $table->timestamps();
+            $table->unique(['key', 'value'], 'settings_key_value_unique');
+            $table->index('key');
         });
 
     }

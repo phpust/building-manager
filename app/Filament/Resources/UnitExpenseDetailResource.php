@@ -36,18 +36,7 @@ class UnitExpenseDetailResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('financial_year')
-                    ->label('سال مالی')
-                    ->options(function () {
-                        $currentYear = Jalalian::now()->getYear();
-                        $years = [];
-                        for ($i = $currentYear - 10; $i <= $currentYear + 1; $i++) {
-                            $years[$i] = $i;
-                        }
-                        return $years;
-                    })
-                    ->default(Jalalian::now()->getYear())
-                    ->required(),
+                Forms\Components\Hidden::make('financial_year')->default(fn () => Setting::financialYear()),
                 Forms\Components\Select::make('expense_id')
                     ->relationship('expense', 'title')
                     ->label('هزینه')
@@ -63,7 +52,7 @@ class UnitExpenseDetailResource extends Resource
                         'owner' => 'مالک',
                         'tenant' => 'مستاجر',
                     ])
-                    ->label('پرداخت‌کننده')
+                    ->label('پرداخت کننده')
                     ->required(),
 
                 Forms\Components\TextInput::make('amount_due')
@@ -86,7 +75,7 @@ class UnitExpenseDetailResource extends Resource
                 Tables\Columns\TextColumn::make('financial_year')->label('سال مالی')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('expense.title')->label('عنوان هزینه')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('unit.owner_name')->label('مالک واحد')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('payer_type')->label('پرداخت‌کننده')->sortable(),
+                Tables\Columns\TextColumn::make('payer_type')->label('پرداخت کننده')->sortable(),
                 Tables\Columns\TextColumn::make('amount_due')->label('مبلغ بدهی')->sortable()->money('IRR', true, 'fa'),
                 Tables\Columns\IconColumn::make('is_paid')->label('وضعیت پرداخت')->boolean(),
             ])

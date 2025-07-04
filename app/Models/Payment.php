@@ -11,7 +11,7 @@ class Payment extends Model
 {
     use HasFinancialYear;
 
-    protected $fillable = ['unit_id', 'payer_type', 'amount', 'paid_at', 'financial_year', 'description'];
+    protected $fillable = ['unit_id', 'user_id', 'payer_type', 'amount', 'paid_at', 'financial_year', 'description'];
 
     protected $casts = [
         'paid_at' => 'date',
@@ -58,6 +58,10 @@ class Payment extends Model
         return $this->hasMany(Deposit::class, 'unit_id', 'unit_id');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
 
 }

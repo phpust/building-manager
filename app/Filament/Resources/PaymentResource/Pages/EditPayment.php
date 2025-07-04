@@ -13,6 +13,12 @@ class EditPayment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('create_expense')
+                ->label('ثبت  پرداختی جدید')
+                ->icon('heroicon-o-plus')
+                ->url(fn () => PaymentResource::getUrl('create'))
+                ->color('success'),
+
             Actions\DeleteAction::make(),
         ];
     }

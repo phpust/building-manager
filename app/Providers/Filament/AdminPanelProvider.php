@@ -11,15 +11,35 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
+use Filament\Facades\Filament;
+use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Assets\Js;
+
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Models\Setting;
 
 class AdminPanelProvider extends PanelProvider
 {
+
+    public function boot(): void
+    {
+        Filament::serving(function () {
+            Filament::getCurrentPanel()?->brandName(
+                config('app.name') . ' - ' . Setting::financialYear()
+            );
+
+            FilamentAsset::register([
+                Js::make('custom-script', resource_path('js/custom-script.js')),
+            ]);
+
+        });
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel

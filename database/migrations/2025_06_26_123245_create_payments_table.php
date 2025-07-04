@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
             $table->enum('payer_type', ['owner', 'tenant']);
-            $table->decimal('amount', 12, 2);
+            $table->decimal('amount', 12, 0);
             $table->date('paid_at');
             $table->text('description')->nullable();
             $table->timestamps();

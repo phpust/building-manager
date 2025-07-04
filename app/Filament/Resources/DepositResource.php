@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\RawJs;
+use App\Models\Setting;
 
 class DepositResource extends Resource
 {
@@ -35,23 +36,20 @@ class DepositResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('financial_year')
-                    ->label('سال مالی')
-                    ->options(function () {
-                        $currentYear = \Morilog\Jalali\Jalalian::now()->getYear();
-                        $years = [];
-                        for ($i = $currentYear - 10; $i <= $currentYear + 1; $i++) {
-                            $years[$i] = $i;
-                        }
-                        return $years;
-                    })
-                    ->default(\Morilog\Jalali\Jalalian::now()->getYear())
-                    ->required(),
+                Forms\Components\TextInput::make('title')
+                    ->label('عنوان ودیعه')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Hidden::make('financial_year')->default(fn () => Setting::financialYear()),
                 Forms\Components\Select::make('unit_id')
                     ->label('واحد')
+                    ->options(function () {
+                        return \App\Models\Unit::all()->mapWithKeys(fn($unit) => [
+                            (string)$unit->id => 'واحد ' . $unit->number
+                        ])->toArray();
+                    })
                     ->searchable()
                     ->preload()
-                    ->relationship('unit', 'owner_name')
                     ->required(),
 
                 Forms\Components\Select::make('payer_type')

@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\ToggleColumn;
 
 class SettingResource extends Resource
 {
@@ -34,10 +35,18 @@ class SettingResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('key')
-                    ->required(),
+                Forms\Components\Hidden::make('key')
+                    ->default('financial_year')
+                    ->dehydrated(),
                 Forms\Components\TextInput::make('value')
-                    ->required(),
+                    ->label('سال مالی')
+                    ->numeric()
+                    ->required()
+                    ->rules(['digits:4', 'min:1396', 'max:1500']),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('فعال؟')
+                    ->onColor('success')
+                    ->inline(false),
             ]);
     }
 
@@ -45,8 +54,30 @@ class SettingResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('key')->label('کلید'),
-                Tables\Columns\TextColumn::make('value')->label('مقدار'),
+                Tables\Columns\TextColumn::make('value')
+                    ->label('سال')
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('فعال')
+                    ->boolean(),
+                ToggleColumn::make('is_active')
+                    ->label('فعال؟')
+                    ->onColor('success')
+                    ->offColor('secondary')
+                    ->afterStateUpdated(function (Setting $record, bool $state, $livewire) {
+                        if($state){
+                            $record->makeActive();
+                            $record->refresh();
+                            $livewire->dispatch('financial-year-updated');
+                        }
+                    }),
+                Tables\Columns\TextColumn::make('updated_at')->label('آخرین بروزرسانی')->jalaliDate()->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('فقط سال فعال')
+                    ->trueLabel('فعال')
+                    ->falseLabel('غیرفعال'),
             ]);
     }
 

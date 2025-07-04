@@ -14,11 +14,8 @@ return new class extends Migration
         Schema::create('payment_usages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('payment_id')->constrained()->cascadeOnDelete();
-
-            // برای مشخص‌کردن اینکه این پرداخت برای کجا استفاده شده
-            $table->nullableMorphs('payable'); // payable_type و payable_id
-
-            $table->decimal('amount_used', 12, 2);
+            $table->nullableMorphs('payable');
+            $table->decimal('amount_used', 12, 0);
             $table->timestamps();
         });
     }

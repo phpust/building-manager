@@ -10,7 +10,7 @@ class Expense extends Model
 {
     use HasFinancialYear;
     
-    protected $fillable = ['title', 'total_amount', 'payer_type', 'date_from', 'financial_year', 'unit_ids', 'attachment'];
+    protected $fillable = ['title', 'is_charge', 'total_amount', 'payer_type', 'date_from', 'financial_year', 'unit_ids', 'attachment'];
 
     protected $casts = [
         'date_from' => 'date',
@@ -21,6 +21,11 @@ class Expense extends Model
     public function unitExpenseDetails(): HasMany
     {
         return $this->hasMany(UnitExpenseDetail::class);
+    }
+
+    public function getSharesCountAttribute(): int
+    {
+        return $this->unitExpenseDetails()->count();
     }
 
     protected static function booted()

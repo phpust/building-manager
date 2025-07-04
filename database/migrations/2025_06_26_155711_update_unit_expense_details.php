@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('unit_expense_details', function (Blueprint $table) {
-            $table->decimal('amount_paid', 12, 2)->default(0)->after('amount_due');
+            $table->decimal('amount_paid', 12, 0)->default(0)->after('amount_due');
             $table->date('due_date')->nullable()->after('amount_due');
             $table->dropColumn('is_paid');
         });

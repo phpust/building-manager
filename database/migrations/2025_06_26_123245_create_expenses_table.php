@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->decimal('total_amount', 12, 2); // مبلغ کل
+            $table->decimal('total_amount', 12, 0); // مبلغ کل
             $table->enum('payer_type', ['owner', 'tenant']);
             $table->date('date_from')->nullable();
             $table->date('date_to')->nullable();

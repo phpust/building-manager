@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('expense_id')->constrained()->cascadeOnDelete();
             $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
             $table->enum('payer_type', ['owner', 'tenant']);
-            $table->decimal('amount_due', 12, 2);
-            $table->decimal('amount_paid', 12, 2)->default(0);
+            $table->decimal('amount_due', 12, 0);
+            $table->decimal('amount_paid', 12, 0)->default(0);
             $table->date('due_date')->nullable();
             $table->timestamps();
         });
