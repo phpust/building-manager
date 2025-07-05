@@ -36,11 +36,6 @@ class UnitFinancialReport extends Page
 
     public function hasTenantInCurrentYear(): bool
     {
-        $fy = Setting::financialYear(); 
-
-        $start = Carbon::createFromFormat('Y', $fy)->startOfYear();
-        $end = Carbon::createFromFormat('Y', $fy)->endOfYear();
-
         return $this->record->tenantsInFinancialYear()
             ->exists();
     }

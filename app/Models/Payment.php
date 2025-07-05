@@ -16,7 +16,25 @@ class Payment extends Model
     protected $casts = [
         'paid_at' => 'date',
         'amount' => 'decimal:0',
+        'type' => 'string',
     ];
+
+    public const TYPE_NORMAL     = 'normal';
+    public const TYPE_CARRY_OVER = 'carry_over';
+    public const TYPE_REFUND     = 'refund';
+
+
+    public function scopeRefuns($q) { 
+        return $q->where('type', self::TYPE_REFUND); 
+    }
+
+    public function scopeCarryOvers($q) { 
+        return $q->where('type', self::TYPE_CARRY_OVER); 
+    }
+
+    public function scopeNormals($q)    { 
+        return $q->where('type', self::TYPE_NORMAL);  
+    }
 
     public function unit(): BelongsTo
     {

@@ -10,9 +10,11 @@ class YearlyBalance extends Model
         'unit_id',
         'financial_year',
         'starting_balance',
-        'starting_deposits',
+        'starting_deposits_paid',
+        'starting_deposits_remaining',
         'ending_balance',
-        'ending_deposits',
+        'ending_deposits_paid',
+        'ending_deposits_remaining',
     ];
 
     public function unit()

@@ -20,6 +20,8 @@ class UnitExpenseDetailResource extends Resource
     protected static ?string $model = UnitExpenseDetail::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
+    
+    protected static bool $shouldRegisterNavigation = false;
 
 
     public static function getModelLabel(): string

@@ -23,12 +23,12 @@ class SettingResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'تنظیمات';
+        return 'تنظیمات سال مالی';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'تنظیمات';
+        return 'تنظیمات سال مالی';
     }
 
     public static function form(Form $form): Form

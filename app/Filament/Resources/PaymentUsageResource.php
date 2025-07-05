@@ -19,11 +19,8 @@ class PaymentUsageResource extends Resource
     protected static ?string $model = PaymentUsage::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    // public static function shouldRegisterNavigation(): bool
-    // {
-    //     return false;
-    // }
+    
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getModelLabel(): string
     {

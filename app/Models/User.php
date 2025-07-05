@@ -45,4 +45,25 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function ownedUnits()
+    {
+        return $this->belongsToMany(
+            Unit::class,            
+            UnitOwner::class,               
+            'user_id',              
+            'unit_id'               
+        );
+    }
+
+    public function rentedUnits()
+    {
+        return $this->belongsToMany(
+            Unit::class,
+            UnitTenant::class,
+            'user_id',
+            'unit_id'
+        )->withPivot(['from_date','to_date']);   
+    }
+
 }

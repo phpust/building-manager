@@ -25,7 +25,7 @@ trait HasFinancialYear
         return $q->withoutGlobalScope('financial_year');
     }
 
-    public function scopeForYear(Builder $q, int $year): Builder
+    public function scopeForYear(Builder $q, $year): Builder
     {
         return $q->allYears()->where($q->getModel()->getTable().'.financial_year', $year);
     }

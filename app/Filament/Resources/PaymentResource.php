@@ -50,13 +50,6 @@ class PaymentResource extends Resource
                         $set('user_id', null);
                     })
                     ->required(),
-                Forms\Components\Select::make('payer_type')
-                    ->label('پرداخت کننده')
-                    ->options([
-                        'owner' => 'مالک',
-                        'tenant' => 'مستاجر',
-                    ])
-                    ->required(),
                 Forms\Components\Select::make('user_id')
                     ->label('پرداخت کننده')
                     ->options(function (callable $get) {
@@ -83,6 +76,13 @@ class PaymentResource extends Resource
                     ->searchable()
                     ->preload()
                     ->reactive()
+                    ->required(),
+                Forms\Components\Select::make('payer_type')
+                    ->label('پرداخت کننده')
+                    ->options([
+                        'owner' => 'مالک',
+                        'tenant' => 'مستاجر',
+                    ])
                     ->required(),
                 Forms\Components\TextInput::make('amount')
                     ->label('مبلغ')

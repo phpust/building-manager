@@ -16,9 +16,11 @@ return new class extends Migration
             $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
             $table->integer('financial_year');          
             $table->bigInteger('starting_balance')->default(0);  
-            $table->bigInteger('starting_deposits')->default(0);   
+            $table->bigInteger('starting_deposits_paid')->default(0);   
+            $table->bigInteger('starting_deposits_remaining')->default(0);
             $table->bigInteger('ending_balance')->default(0);
-            $table->bigInteger('ending_deposits')->default(0);
+            $table->bigInteger('ending_deposits_paid')->default(0);
+            $table->bigInteger('ending_deposits_remaining')->default(0);
             $table->timestamps();
 
             $table->unique(['unit_id', 'financial_year']);
