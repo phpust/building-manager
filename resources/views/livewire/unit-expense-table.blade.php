@@ -31,7 +31,23 @@
 
 @endphp
 
-<div>
+<div class="overflow-x-auto">
+    @if ($unit->hasTenantInFinancialYear())
+        <div class="flex gap-4 mb-4" x-data>
+            <x-filament::button @click="$wire.set('filter', 'owner')">
+                مالک
+            </x-filament::button>
+
+            <x-filament::button @click="$wire.set('filter', 'tenant')">
+                مستأجر
+            </x-filament::button>
+
+            <x-filament::button @click="$wire.set('filter', 'all')">
+                همه
+            </x-filament::button>
+        </div>
+    @endif
+
     <div class="mb-6 bg-white p-4 rounded-xl shadow border border-gray-200">
         <h2 class="text-lg font-bold text-gray-800 mb-3">
             🏢 واحد {{ $unit->number ?? '—' }}
@@ -40,6 +56,7 @@
                 - {{ $unit->description }} 
             @endif
         </h2>
+        @auth
         <h2 class="text-lg font-bold text-gray-800 mb-3">👥 اطلاعات مالکین و مستأجران در سال {{ \App\Models\Setting::financialYear() }}</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -83,6 +100,7 @@
                 @endforelse
             </div>
         </div>
+        @endauth
     </div>
 
     <div class="bg-white p-6 rounded-xl shadow border border-gray-200 mt-12">

@@ -67,6 +67,11 @@ class Unit extends Model
             ;
     }
 
+    public function hasTenantInFinancialYear(): bool
+    {
+        return $this->tenantsInFinancialYear()->exists();
+    }
+
     public function getOwnersNameInFinancialYearAttribute(): string
     {
         return $this->ownersInFinancialYear()
