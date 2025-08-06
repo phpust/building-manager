@@ -66,7 +66,7 @@ class UnitExpenseDetailsRelationManager extends RelationManager
                     ->label('مبلغ پرداخت شده')
                     ->getStateUsing(function ($record) {
                         $amount = number_format($record->paymentUsages->sum('amount_used'));
-                        return fa_numbers($amount) . ' ریال';
+                        return $amount . ' ریال';
                     }),
 
             ])

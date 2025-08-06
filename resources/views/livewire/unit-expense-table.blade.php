@@ -14,8 +14,10 @@
     $otherDue  = $netBalance < 0 ? abs($netBalance) : 0;
     
     if ($totalChargeRemaining > $otherDue) {
+        $otherDue2 = $otherDue;
         $otherDue = 0;
     }else{
+        $totalChargeRemaining2 = $totalChargeRemaining;
         $totalChargeRemaining = 0;
     }
 
@@ -125,11 +127,16 @@
         <div class="text-right text-base mt-2 mb-4">
             بدون در نظر گرفتن ودیعه، شما در سال جاری مبلغ 
             <span class="font-extrabold text-green-700">{{ number_format($totalPaymentsWithoutDeposit) }}</span> ریال پرداخت کرده‌اید و با احتساب مانده از سال‌های قبل،
-            @if ($netBalance > $totalChargeRemaining)
+            @if ($totalChargeRemaining > 0)
+                <span class="text-red-700 font-semibold">{{ number_format($totalChargeRemaining) }}</span> ریال بدهکار هستید.
+            @elseif ($netBalance > $totalChargeRemaining)
                 <span class="text-green-700 font-semibold">{{ number_format($creditInFund) }}</span> ریال اضافه در صندوق دارید.
             @elseif ($netBalance < 0)
                 
                 <span class="text-red-700 font-semibold">{{ number_format($debtDue) }}</span> ریال بدهکار هستید.
+            @elseif ($totalChargeRemaining > 0)
+                
+                <span class="text-red-700 font-semibold">{{ number_format($totalChargeRemaining) }}</span> ریال بدهکار هستید.
             @else
                 پرداخت‌های شما با هزینه‌ها برابر است.
             @endif
@@ -208,6 +215,16 @@
                 </div>
 
                 <div>
+                    @if($totalChargeRemaining > 0)
+                        هزینه‌ها:
+                        <strong class="text-red-600">{{ number_format($otherDue2) }} ریال</strong>
+                    @elseif($otherDue > 0)
+                        شارژ:
+                        <strong class="text-red-600">{{ number_format($totalChargeRemaining2) }} ریال</strong>
+                    @endif
+                </div>
+
+                <div>
                     ودیعه: 
                     <strong class="{{ $totalDepositsRemaining ? 'text-red-600' : 'text-green-600' }}">
                         {{ number_format($totalDepositsRemaining) }} ریال
@@ -231,6 +248,7 @@
                 <tr>
                     <th class="px-4 py-2 text-right">مبلغ  (ریال)</th>
                     <th class="px-4 py-2 text-right">واریز کننده</th>
+                    <th class="px-4 py-2 text-right"> توضیحات</th>
                     <th class="px-4 py-2 text-right">تاریخ  واریز</th>
                 </tr>
             </thead>
@@ -241,6 +259,7 @@
                         <td class="px-4 py-2">
                             {{ $payment->payer_type === 'owner' ? 'مالک' : 'مستأجر' }}
                         </td>
+                        <td class="px-4 py-2">{{ $payment->description }}</td>
                         <td class="px-4 py-2">
                             {{ jdate($payment->paid_at ?? $payment->created_at)->format('Y/m/d') }}
                         </td>
@@ -379,7 +398,7 @@
                         @if (!empty($expense->expense->attachment))
                             <button 
                                 x-data 
-                                @click="$dispatch('show-attachment', { url: '{{ asset('storage/' . $expense->expense->attachment) }}' })" 
+                                @click="$dispatch('show-attachment', { url: '{{ asset('uploads/' . $expense->expense->attachment) }}' })" 
                                 class="text-blue-600 hover:text-blue-800">
                                 <x-heroicon-o-eye class="w-5 h-5" />
                             </button>

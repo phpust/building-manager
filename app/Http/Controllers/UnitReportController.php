@@ -19,6 +19,10 @@ class UnitReportController extends Controller
                      ->orderBy('number')
                      ->get();
 
-        return view('guest.unit-report', compact('units', 'selectedUnit'));
+        $years = \App\Models\Setting::years();
+        $selectedYear = \App\Models\Setting::financialYear();
+        
+
+        return view('guest.unit-report', compact('units', 'selectedUnit', 'years', 'selectedYear'));
     }
 }

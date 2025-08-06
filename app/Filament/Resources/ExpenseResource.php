@@ -118,7 +118,7 @@ class ExpenseResource extends Resource
                         if ($state == 'empty') {
                             return '<div class="text-center w-full">-</div>';
                         }
-
+                        
                         $url = Storage::disk('public')->url($state); // تولید لینک کامل
                         return "<a href='{$url}' target='_blank'>
                                     <span class='fi-ta-text-item-label text-sm leading-6 text-gray-950 dark:text-white'>

@@ -26,6 +26,10 @@ class Setting extends Model
 
     public static function financialYear(): int
     {
+        if ($year = request('financial_year')) {
+            return (int) $year;
+        }
+        
         return cache()->rememberForever('financial_year', function () {
             return (int) self::query()
                 ->where('key', 'financial_year')
@@ -33,6 +37,13 @@ class Setting extends Model
                 ->value('value')
                 ?: now()->year;
         });
+    }
+
+    public static function years()
+    {
+        return self::query()
+                ->where('key', 'financial_year')
+                ->pluck('value');
     }
 
     public static function setFinancialYear(int $year): void

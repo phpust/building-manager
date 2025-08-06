@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource\RelationManagers;
+use App\Filament\Resources\PaymentResource\Widgets\PaymentSummary;
 use App\Models\Payment;
 use App\Models\Setting;
 use Filament\Forms;
@@ -111,10 +112,10 @@ class PaymentResource extends Resource
                 Tables\Columns\TextColumn::make('id')->label('ID')->sortable()->label('شناسه'),
                 Tables\Columns\TextColumn::make('financial_year')->label('سال مالی')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('unit.number')->label('شماره واحد')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('user.name')->label('پرداخت کننده')->sortable(),
+                Tables\Columns\TextColumn::make('user.name')->label('پرداخت کننده')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('amount')->label('مبلغ')->sortable()->money('IRR', true, 'fa'),
                 Tables\Columns\TextColumn::make('paid_at')->label('تاریخ پرداخت')->jalaliDate()->sortable(),
-                Tables\Columns\TextColumn::make('description')->label('توضیحات')->limit(50),
+                Tables\Columns\TextColumn::make('description')->label('توضیحات')->limit(50)->searchable(),
             ])
             ->filters([
                 //
@@ -125,7 +126,7 @@ class PaymentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])->defaultSort('paid_at', 'desc');
     }
 
     public static function getRelations(): array

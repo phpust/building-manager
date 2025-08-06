@@ -49,9 +49,9 @@ class FinancialYearCloser
                                            ->where('financial_year', $fromYear)
                                            ->first();
 
-                    $openingBalance        = $lastYearBalance?->ending_balance   ?? 0;
-                    $openingDepositsPaid   = $lastYearBalance?->ending_deposits_paid  ?? 0;
-                    $openingDepositsRemain = $lastYearBalance?->ending_deposits_remaining  ?? 0;
+                    $openingBalance        = $lastYearBalance?->starting_balance   ?? 0;
+                    $openingDepositsPaid   = $lastYearBalance?->starting_deposits_paid  ?? 0;
+                    $openingDepositsRemain = $lastYearBalance?->starting_deposits_remaining  ?? 0;
 
 
                     $totalOpening = YearlyBalance::where('financial_year', $fromYear)

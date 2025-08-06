@@ -77,7 +77,7 @@ class UnitExpenseTable extends Component
             default  => null,
         };
 
-        return $query->latest()->get();
+        return $query->orderBy('paid_at', 'ASC')->get();
     }
 
     protected function getSummary(): array

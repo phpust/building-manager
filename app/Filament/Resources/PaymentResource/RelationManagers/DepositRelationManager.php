@@ -49,7 +49,7 @@ class DepositRelationManager extends RelationManager
                     ->label('مبلغ پرداخت شده')
                     ->getStateUsing(function ($record) {
                         $amount = number_format($record->paymentUsages->sum('amount_used'));
-                        return fa_numbers($amount) . ' ریال';
+                        return $amount . ' ریال';
                     }),
                 Tables\Columns\TextColumn::make('paid_from_this_payment')
                 ->label('پرداخت شده از این پرداخت')
@@ -58,7 +58,7 @@ class DepositRelationManager extends RelationManager
                         ->where('payment_id', $this->ownerRecord->id)
                         ->sum('amount_used');
 
-                    return fa_numbers(number_format($amount)) . ' ریال';
+                    return number_format($amount) . ' ریال';
                 }),
             ])
             ->actions([

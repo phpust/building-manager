@@ -79,7 +79,7 @@ class DepositResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('شناسه')->sortable(),
                 Tables\Columns\TextColumn::make('financial_year')->label('سال مالی')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('unit.owner_name')->label('مالک واحد')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('unit.owners_name_in_financial_year')->label('مالک واحد')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('payer_type')->label('پرداخت کننده')->sortable(),
                 Tables\Columns\TextColumn::make('amount')->label('مبلغ ودیعه')->sortable()->money('IRR', true, 'fa'),
                 Tables\Columns\IconColumn::make('is_paid')->label('وضعیت پرداخت')->boolean(),

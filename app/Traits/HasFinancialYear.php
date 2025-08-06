@@ -10,9 +10,14 @@ trait HasFinancialYear
 {
     protected static function bootHasFinancialYear(): void
     {
-        static::addGlobalScope('financial_year', fn ($q) =>
-            $q->where($q->getModel()->getTable().'.financial_year', Setting::financialYear())
-        );
+        static::addGlobalScope('financial_year', function (Builder $q) {
+            // اگر کاربر در کوئری استرینگ سال داده باشه
+            $year = request('financial_year') 
+                ? (int) request('financial_year') 
+                : Setting::financialYear();
+
+            $q->where($q->getModel()->getTable() . '.financial_year', $year);
+        });
 
 
         static::creating(function ($model) {
